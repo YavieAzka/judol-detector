@@ -1,0 +1,16 @@
+// struktur data hasil pencarian algoritma
+export interface SearchResult {
+    keyword: string;
+    algorithm: 'KMP' | 'BM' | 'Regex' | 'Levenshtein';
+    startIndex: number;
+    endIndex: number;
+    occurrences: number;
+    executionTime: number;
+}
+
+// struktur data utk mapping karakter dengan node teks DOM
+export interface TextNodeMap {
+    node: Text;
+    startIndex: number;
+    endIndex: number;
+}
