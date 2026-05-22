@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/aufafaza/Tubes3_kakeguruistimashou#readme",
   "devDependencies": {
+    "@types/chrome": "^0.0.260",
     "@types/node": "^20.11.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.13"
