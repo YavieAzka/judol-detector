@@ -2,10 +2,12 @@ import type { SearchResult } from '../interface.js';
 import '../styles/content.css';
 import { buildTextMap } from '../content/dom_walker.js';
 import { Highlighter } from '../content/highlight.js';
+import { mockSearch } from '../mock.js';
 
 // event listener untuk menerima pesan dari popup utk toggle blur
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     
+    // pesan yang diterima adalah perintah toggle blur
     if (message.command === "TOGGLE_BLUR") {
         // mencari semua elemen hasil highlight di halaman web
         const highlights = document.querySelectorAll('.judol-highlight');
@@ -18,21 +20,63 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 span.classList.remove('is-blurred');
             }
         });
-        console.log(`Blur state updated to: ${message.blurState}`);
+        console.log(`Blur state: ${message.blurState}`);
         sendResponse({ status: "success" });
     }
+
+    // pesan yang diterima adalah perintah rescan halaman web
+    else if (message.command === "MANUAL_RESCAN") {
+        console.log("Manual re-scanning...");
+        
+        // menghapus semua highlight yang ada di halaman web
+        Highlighter.removeAllHighlights();
+        
+        // scan ulang halaman web
+        scanPage(document.body, true);
+        
+        sendResponse({ status: "Rescan initiated" });
+    }
+
     return false;
 });
+
+// tooltip saat hover pada hasil highlight
+const tooltip = document.createElement('div');
+tooltip.id = 'judol-tooltip';
+tooltip.style.position = 'absolute';
+tooltip.style.display = 'none';
+tooltip.style.backgroundColor = '#333';
+tooltip.style.color = '#fff';
+tooltip.style.padding = '8px';
+tooltip.style.borderRadius = '4px';
+tooltip.style.zIndex = '999999';
+document.body.appendChild(tooltip);
 
 // event listener untuk menampilkan tooltip saat hover pada hasil highlight
 document.addEventListener('mouseover', (event) => {
     const target = event.target as HTMLElement;
     
     if (target.classList.contains('judol-highlight')) {
-        console.log("Keyword:", target.dataset.keyword);
-        console.log("Algorithm:", target.dataset.algorithm);
-        console.log("Occurrences:", target.dataset.occurrences);
-        console.log("Execution Time:", target.dataset.time);
+        // komponen tooltip
+        tooltip.innerHTML = `
+            <strong>Keyword:</strong> ${target.dataset.keyword} <br>
+            <strong>Algorithm:</strong> ${target.dataset.algorithm} <br>
+            <strong>Occurrences:</strong> ${target.dataset.occurrences} <br>
+            <strong>Time:</strong> ${target.dataset.time} ms
+        `;
+
+        // posisi berada di kanan mouse pointer
+        tooltip.style.left = `${event.pageX + 15}px`;
+        tooltip.style.top = `${event.pageY + 15}px`;
+        tooltip.style.display = 'block';
+    }
+});
+
+// event listener saat mouse keluar dari hasil highlight
+document.addEventListener('mouseout', (event) => {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('judol-highlight')) {
+        tooltip.style.display = 'none';
     }
 });
 
