@@ -24,3 +24,10 @@ export interface StorageData {
         detailedResults: SearchResult[];
     }
 }
+
+// struktur data utk visualisasi perbandingan hasil pencarian algoritma
+export interface ChartData {
+    label: string;
+    value: number;
+    color: string;
+}
