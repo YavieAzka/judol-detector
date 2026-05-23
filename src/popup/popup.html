@@ -1,3 +1,28 @@
 <script type="module" src="./popup.ts"></script>
-<canvas id="statsChart" width="300" height="200"></canvas>
-<input type="checkbox" id="blur-toggle">
+<body style="width: 350px; padding: 15px; font-family: Arial, sans-serif;">
+    <h2 style="margin-top: 0; color: #2c3e50;">Statistik Hasil Deteksi</h2>
+    
+    <div style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+        <p style="margin: 5px 0;"><strong>Total Keyword yang Ditemukan:</strong> <span id="total-count">0</span></p>
+        <p style="margin: 0 0 5px 0; border-bottom: 1px solid #ddd; padding-bottom: 4px;"><strong>Waktu Eksekusi tiap Algoritma:</strong></p>
+        <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+            <li>KMP: <span id="time-kmp">0.00</span> ms</li>
+            <li>Boyer-Moore: <span id="time-bm">0.00</span> ms</li>
+            <li>RegEx: <span id="time-regex">0.00</span> ms</li>
+            <li>Levenshtein: <span id="time-lev">0.00</span> ms</li>
+        </ul>
+    </div>
+
+    <canvas id="statsChart" width="300" height="200" style="display: block; margin: 0 auto;"></canvas>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+    <label style="cursor: pointer; font-weight: bold; display: flex; align-items: center;">
+        <input type="checkbox" id="blur-toggle" style="margin-right: 8px;"> 
+        Aktifkan Blur
+    </label>
+
+    <button id="rescan-btn" style="width: 100%;padding: 10px;background-color: #3498db;color: white;border: none;border-radius: 4px;font-weight: bold;cursor: pointer;margin-bottom: 15px;transition: background-color 0.3s;">
+        Rescan Halaman
+    </button>
+</body>

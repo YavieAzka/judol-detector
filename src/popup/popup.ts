@@ -64,18 +64,41 @@ function drawComparisonChart(statsArray: ChartData[]) {
 
 // fungsi utk render dashboard
 export function renderStatistics(stats?: StorageData['judolStats']) {
-    // mengambil elemen DOM untuk menampilkan total keywords dan waktu eksekusi
+    // mengambil elemen DOM untuk menampilkan total keywords dan waktu eksekusi tiap algoritma
     const totalCountElement = document.getElementById('total-count');
-    const timeElement = document.getElementById('execution-time');
+    const timeKmpEl = document.getElementById('time-kmp');
+    const timeBmEl = document.getElementById('time-bm');
+    const timeRegexEl = document.getElementById('time-regex');
+    const timeLevEl = document.getElementById('time-lev');
 
+    // edge case: jika tidak ada data statistik yang ditemukan
     if (!stats) {
         if (totalCountElement) totalCountElement.textContent = "No scan data found. Please refresh the page!";
-        if (timeElement) timeElement.textContent = "";
         return;
     }
-
     if (totalCountElement) totalCountElement.textContent = stats.totalKeywords.toString();
-    if (timeElement) timeElement.textContent = `${stats.totalExecutionTime.toFixed(2)} ms`;
+    
+    // waktu eksekusi tiap algoritma: penjumlahan waktu eksekusi dari semua hasil pencarian yang menggunakan algoritma tersebut
+    const kmpTime = stats.detailedResults
+        .filter(result => result.algorithm === 'KMP')
+        .reduce((sum, result) => sum + result.executionTime, 0);
+        
+    const bmTime = stats.detailedResults
+        .filter(result => result.algorithm === 'BM')
+        .reduce((sum, result) => sum + result.executionTime, 0);
+        
+    const regexTime = stats.detailedResults
+        .filter(result => result.algorithm === 'Regex')
+        .reduce((sum, result) => sum + result.executionTime, 0);
+        
+    const levTime = stats.detailedResults
+        .filter(result => result.algorithm === 'Levenshtein')
+        .reduce((sum, result) => sum + result.executionTime, 0);
+
+    if (timeKmpEl) timeKmpEl.textContent = kmpTime.toFixed(2);
+    if (timeBmEl) timeBmEl.textContent = bmTime.toFixed(2);
+    if (timeRegexEl) timeRegexEl.textContent = regexTime.toFixed(2);
+    if (timeLevEl) timeLevEl.textContent = levTime.toFixed(2);
 
     // data untuk chart perbandingan hasil pencarian algoritma
     const kmpMatches = stats.detailedResults
@@ -111,7 +134,6 @@ chrome.storage.onChanged.addListener((changes: { [key: string]: chrome.storage.S
 
 // event listener utk toggle efek blur pada hasil highlight di halaman web
 const blurToggle = document.getElementById('blur-toggle') as HTMLInputElement | null;
-
 if (blurToggle) {
     blurToggle.addEventListener('change', async (event) => {
         const isEnabled = (event.target as HTMLInputElement).checked;
@@ -130,5 +152,30 @@ if (blurToggle) {
         // edge case: save state toggle blur ke storage
         // agar saat user membuka popup kembali, state toggle blur bisa tetap sesuai dengan preferensi terakhir
         chrome.storage.local.set({ isBlurEnabled: isEnabled });
+    });
+}
+
+// event listener untuk tombol rescan halaman web dengna algoritma pencarian
+const rescanBtn = document.getElementById('rescan-btn') as HTMLButtonElement | null;
+if (rescanBtn) {
+    rescanBtn.addEventListener('click', async () => {
+        rescanBtn.disabled = true;
+        rescanBtn.textContent = 'Scanning...';
+        rescanBtn.style.backgroundColor = '#95a5a6';
+
+        // mencari tab aktif saat ini
+        const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (activeTab?.id) {
+            // mengirim pesan ke content script untuk melakukan rescan halaman web
+            chrome.tabs.sendMessage(activeTab.id, { command: "MANUAL_RESCAN" })
+                .catch(() => {});
+        }
+
+        // reset button setelah delay utk memberi waktu bagi content script melakukan scan dan update hasilnya di storage
+        setTimeout(() => {
+            rescanBtn.disabled = false;
+            rescanBtn.textContent = 'Rescan Halaman';
+            rescanBtn.style.backgroundColor = '#3498db';
+        }, 800);
     });
 }
