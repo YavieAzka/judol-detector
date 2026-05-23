@@ -13,6 +13,10 @@
       "js": ["content.js"],
       "css": ["content.css"]
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
 }
  
