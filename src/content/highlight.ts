@@ -4,7 +4,7 @@ import type { SearchResult, TextNodeMap } from "../interface.js";
 export class Highlighter {
     
     // fungsi untuk menerapkan highlight pada teks hasil pencarian
-    public static applyHighlight(match: SearchResult, shadowMap: TextNodeMap[]) {
+    public static applyHighlight(match: SearchResult, shadowMap: TextNodeMap[], blurEnabled = false) {
         // mencari setiap node yang tumpang tindih dengan hasil pencarian
         const overlappingNodes = shadowMap.filter(mappedNode => {
             return mappedNode.startIndex < match.endIndex && mappedNode.endIndex > match.startIndex;
@@ -30,14 +30,14 @@ export class Highlighter {
             // TODO (Your Job): 
             // Use localStartIndex and localEndIndex with node.splitText() 
             // to wrap the isolated text in <span class="judol-highlight">...</span>
-            this.wrapNode(mappedNode.node, localStartIndex, localEndIndex);
+            this.wrapNode(mappedNode.node, localStartIndex, localEndIndex, blurEnabled, match);
         }
     }
 
     /**
      * Physically splits a text node and wraps the target characters in a span.
      */
-    private static wrapNode(node: Text, start: number, end: number) {
+    private static wrapNode(node: Text, start: number, end: number, blurEnabled: boolean, match: SearchResult) {
         // memastikan node memiliki parent sebelum melakukan split (edge case)
         if (!node.parentNode) {
             return;
@@ -60,8 +60,17 @@ export class Highlighter {
         // buat elemen span untuk membungkus teks yang di-highlight
         const span = document.createElement("span");
         span.className = "judol-highlight";
-        span.appendChild(middleNode);
+        if (blurEnabled) {
+            span.classList.add("is-blurred");
+        }
+
+        span.dataset.keyword = match.keyword;
+        span.dataset.algorithm = match.algorithm;
+        span.dataset.occurrences = match.occurrences.toString();
+        span.dataset.time = match.executionTime.toString();
+
         node.parentNode.replaceChild(span, middleNode);
+        span.appendChild(middleNode);
     }
 
     // fungsi untuk menghapus semua highlight

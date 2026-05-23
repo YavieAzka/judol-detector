@@ -1,0 +1,13 @@
+.judol-highlight {
+    background-color: #ffeaa7; /* warna highlight keyword */
+    color: #000;
+    font-weight: bold;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+.judol-highlight.is-blurred {
+    filter: blur(5px);
+    user-select: none; /* teks yang diblur tidak bisa diselect */
+    transition: filter 0.3s ease; /* animasi sederhana utk efek blur */
+}

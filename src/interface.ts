@@ -14,3 +14,13 @@ export interface TextNodeMap {
     startIndex: number;
     endIndex: number;
 }
+
+// struktur data statistik yang disimpan di storage
+export interface StorageData {
+    judolStats?: {
+        lastScanTime: number;
+        totalKeywords: number;
+        totalExecutionTime: number;
+        detailedResults: SearchResult[];
+    }
+}
