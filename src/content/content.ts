@@ -3,6 +3,7 @@ import "../styles/content.css";
 import { buildTextMap } from "../content/dom_walker.js";
 import { Highlighter } from "../content/highlight.js";
 import { Matcher } from "../algorithms/algorithm.js";
+import { fuzzySearch } from "../algorithms/fuzzy.js";
 // event listener untuk menerima pesan dari popup utk toggle blur
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // pesan yang diterima adalah perintah toggle blur
@@ -166,11 +167,17 @@ async function scanPage(
 
   rawResults.push(...Matcher.regexSearch(flatTextMap));
 
+  const exactResults: SearchResult[] = [];
   for (const keyword of keywordsToSearch) {
-    rawResults.push(...Matcher.kmpSearch(flatTextMap, keyword || ""));
-    rawResults.push(...(Matcher.boyerMooreSearch(flatTextMap, keyword) || []));
+    exactResults.push(...Matcher.kmpSearch(flatTextMap, keyword || ""));
+    exactResults.push(
+      ...(Matcher.boyerMooreSearch(flatTextMap, keyword) || []),
+    );
   }
+  rawResults.push(...exactResults);
 
+  const fuzzyResults = fuzzySearch(flatTextMap, keywordsToSearch, exactResults);
+  rawResults.push(...fuzzyResults);
   // filter hasil pencarian overlap
   const filteredResults = filterOverlappingMatches(rawResults);
 

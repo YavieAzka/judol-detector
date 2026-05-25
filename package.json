@@ -4,7 +4,8 @@
   "description": "String matching is quite hard and there are lots of algorithms to implement in this tubes, hence we divide the jobs into three categories: \r | Person | Job | \r | ------ | --- | \r | 1      | Actual string matching and regular expression matching, the math yada yada. |\r | 2 | Fuzzy matching. This person is also responsible in testing, i.e. determening edge-cases, etc.  | \r | 3 | Chrome extension development (i.e. manifest.json, its animations, etc.). |",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vite build"
   },
   "repository": {
     "type": "git",
