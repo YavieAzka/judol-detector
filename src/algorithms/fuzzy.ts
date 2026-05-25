@@ -174,43 +174,64 @@ export function fuzzySearch(
   const startTime = performance.now();
   const results: SearchResult[] = [];
 
-  // Kumpulkan keyword yang sudah memiliki exact match → skip fuzzy untuk keyword ini
-  const exactlyMatchedKeywords = new Set(
-    exactMatches.map((r) => r.keyword.toLowerCase()),
+  // Saring keyword yang terlalu pendek (tetap berlaku global)
+  const keywordsToFuzz = keywords.filter(
+    (kw) => kw.length >= MIN_KEYWORD_LENGTH,
   );
-
-  // Saring keyword yang perlu difuzzy
-  const keywordsToFuzz = keywords.filter((kw) => {
-    if (kw.length < MIN_KEYWORD_LENGTH) return false;
-    return !exactlyMatchedKeywords.has(kw.toLowerCase());
-  });
 
   if (keywordsToFuzz.length === 0) return results;
 
+  // Kumpulkan range posisi yang sudah di-cover oleh exact match
+  // Skip PER TOKEN, bukan per keyword — sehingga keyword yang sama
+  // tetap bisa menangkap token lain yang dimanipulasi di lokasi berbeda.
+  const exactMatchedRanges = exactMatches.map((r) => ({
+    start: r.startIndex,
+    end: r.endIndex,
+  }));
+
   // Tokenisasi flatTextMap sekali saja (efisiensi)
   const tokens = tokenize(flatTextMap);
+
+  // Debug log (hapus setelah selesai testing)
+  console.log(
+    "Tokens:",
+    tokens.map((t) => t.word),
+  );
+  console.log("Keywords to fuzz:", keywordsToFuzz);
 
   for (const token of tokens) {
     // Skip token yang terlalu pendek
     if (token.word.length < MIN_TOKEN_LENGTH) continue;
 
-    // Bandingkan token dengan setiap keyword yang perlu difuzzy
+    // Skip token yang range-nya sudah di-cover exact match
+    const alreadyCovered = exactMatchedRanges.some(
+      (range) => range.start <= token.startIndex && token.endIndex <= range.end,
+    );
+    if (alreadyCovered) continue;
+
+    // Bandingkan token dengan setiap keyword, pilih yang paling mirip
+    let bestScore = -1;
+    let bestKeyword = "";
+
     for (const keyword of keywordsToFuzz) {
       const score = similarityScore(token.word, keyword);
 
-      if (score >= SIMILARITY_THRESHOLD) {
-        results.push({
-          keyword: keyword,
-          algorithm: "Levenshtein",
-          startIndex: token.startIndex,
-          endIndex: token.endIndex,
-          occurrences: 1,
-          executionTime: 0, // diisi setelah loop selesai
-        });
-
-        // Satu token hanya di-match dengan keyword terbaik (tidak perlu lanjut)
-        break;
+      if (score >= SIMILARITY_THRESHOLD && score > bestScore) {
+        bestScore = score;
+        bestKeyword = keyword;
       }
+    }
+
+    // Hanya push hasil terbaik per token (hindari duplikasi)
+    if (bestKeyword !== "") {
+      results.push({
+        keyword: bestKeyword,
+        algorithm: "Levenshtein",
+        startIndex: token.startIndex,
+        endIndex: token.endIndex,
+        occurrences: 1,
+        executionTime: 0,
+      });
     }
   }
 
