@@ -1,0 +1,242 @@
+html_content = """<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Judol Detector — Test Cases</title>
+  </head>
+  <body>
+    <h1>Judol Detector — Test Cases</h1>
+    <p>
+      Buka file ini di Chrome dengan extension aktif. Setiap blok berisi teks
+      yang <em>seharusnya</em> (atau tidak) terdeteksi.
+    </p>
+
+    <div class="legend">
+      <span>Expect: KMP/BM</span>
+      <span>Expect: RegEx</span>
+      <span>Expect: Levenshtein</span>
+      <span>Expect: TIDAK terdeteksi (false positive check)</span>
+    </div>
+
+    <h2>TC-01 · Exact Match (KMP / BM)</h2>
+    <p>
+      Keyword persis seperti di keyword.txt. KMP dan BM wajib menangkap ini.
+    </p>
+
+    <div class="case">
+      <div class="label">TC-01a — Exact, uppercase</div>
+      GACOR
+    </div>
+
+    <div class="case">
+      <div class="label">TC-01b — Exact, lowercase</div>
+      gacor
+    </div>
+
+    <div class="case">
+      <div class="label">TC-01c — Exact, mixed case</div>
+      GaCor
+    </div>
+
+    <div class="case">
+      <div class="label">TC-01d — Keyword di tengah kalimat</div>
+      Jangan pernah bermain slot karena sangat berbahaya bagi keuangan.
+    </div>
+
+    <div class="case">
+      <div class="label">TC-01e — Beberapa keyword dalam satu kalimat</div>
+      Website judol seperti gacor dan maxwin harus dihindari.
+    </div>
+
+    <h2>TC-02 · RegEx Match — Pola &lt;kata&gt;&lt;angka&gt;</h2>
+    <p>Regex wajib menangkap pola kata diikuti 2–3 angka tanpa spasi.</p>
+
+    <div class="case">
+      <div class="label">TC-02a — 2 angka di belakang</div>
+      MAXWIN88
+    </div>
+
+    <div class="case">
+      <div class="label">TC-02b — 3 angka di belakang</div>
+      SLOT999
+    </div>
+
+    <div class="case">
+      <div class="label">TC-02c — Bukan keyword, tapi pola cocok</div>
+      KOPI77
+    </div>
+
+    <div class="case">
+      <div class="label">TC-02d — Angka di tengah kalimat</div>
+      Daftar sekarang di HOKI88 dan menangkan hadiah besar!
+    </div>
+
+    <div class="case">
+      <div class="label">
+        TC-02e — 1 angka saja (seharusnya TIDAK cocok regex)
+      </div>
+      GACOR9
+    </div>
+
+    <div class="case">
+      <div class="label">
+        TC-02f — 4 angka (seharusnya TIDAK cocok regex \d{2,3})
+      </div>
+      MAXWIN8888
+    </div>
+
+    <h2>TC-03 · Fuzzy Match — Substitusi Visual (Levenshtein)</h2>
+    <p>
+      Karakter diganti dengan yang mirip secara visual. KMP/BM tidak akan
+      menangkap, Levenshtein harus menangkap.
+    </p>
+
+    <div class="case">
+      <div class="label">TC-03a — 'a' diganti '4'</div>
+      G4COR
+    </div>
+
+    <div class="case">
+      <div class="label">TC-03b — 'o' diganti '0'</div>
+      GAC0R
+    </div>
+
+    <div class="case">
+      <div class="label">TC-03c — 'i' diganti '1'</div>
+      MAX1N
+    </div>
+
+    <div class="case">
+      <div class="label">TC-03d — Alpha Yunani (unicode kamuflase)</div>
+      Gαcor
+    </div>
+
+    <div class="case">
+      <div class="label">TC-03e — Omicron Yunani mengganti 'o'</div>
+      GAСοR
+    </div>
+
+    <div class="case">
+      <div class="label">TC-03f — Kombinasi dua substitusi visual</div>
+      G4C0R
+    </div>
+
+    <h2>TC-04 · Edge Case — Batas Threshold</h2>
+    <p>
+      Kasus di sekitar batas threshold 0.75. Validasi apakah sistem terlalu
+      sensitif atau tidak.
+    </p>
+
+    <div class="case">
+      <div class="label">
+        TC-04a — 1 substitusi biasa (sim ≈ 0.80, seharusnya lolos)
+      </div>
+      GAXOR
+    </div>
+
+    <div class="case">
+      <div class="label">
+        TC-04b — 2 substitusi biasa pada kata pendek (sim ≈ 0.60, seharusnya
+        TIDAK lolos)
+      </div>
+      GAXYR
+    </div>
+
+    <div class="case">
+      <div class="label">
+        TC-04c — Kata berbeda total (false positive check)
+      </div>
+      MOTOR
+    </div>
+
+    <div class="case">
+      <div class="label">
+        TC-04d — Kata umum bahasa Indonesia (false positive check)
+      </div>
+      makan minum tidur belajar kuliah ujian tugas
+    </div>
+
+    <h2>TC-05 · Edge Case — Panjang Token</h2>
+    <p>
+      Token sangat pendek di-skip oleh fuzzy (MIN_TOKEN_LENGTH = 4). Validasi
+      guard ini.
+    </p>
+
+    <div class="case">
+      <div class="label">
+        TC-05a — Token 3 karakter (seharusnya di-skip fuzzy)
+      </div>
+      GAC
+    </div>
+
+    <div class="case">
+      <div class="label">TC-05b — Token 2 karakter</div>
+      GA
+    </div>
+
+    <div class="case">
+      <div class="label">
+        TC-05c — Token tepat 4 karakter (minimal, seharusnya diproses)
+      </div>
+      slot
+    </div>
+
+    <h2>TC-06 · Edge Case — Format Teks Khusus</h2>
+    <p>Variasi format yang mungkin muncul di halaman web nyata.</p>
+
+    <div class="case">
+      <div class="label">
+        TC-06a — Keyword dengan spasi di tengah (seharusnya TIDAK terdeteksi —
+        program tidak handle ini)
+      </div>
+      GA COR
+    </div>
+
+    <div class="case">
+      <div class="label">TC-06b — Keyword dengan tanda hubung</div>
+      GA-COR
+    </div>
+
+    <div class="case">
+      <div class="label">TC-06c — Keyword dalam tanda kurung</div>
+      Hindari situs (gacor) yang menjanjikan kemenangan besar.
+    </div>
+
+    <div class="case">
+      <div class="label">TC-06d — Keyword dengan tanda seru</div>
+      Main GACOR sekarang!
+    </div>
+
+    <div class="case">
+      <div class="label">TC-06e — Keyword angka dalam kalimat panjang</div>
+      Bergabunglah dengan komunitas SLOT88 dan raih jackpot impianmu setiap hari
+      tanpa batas.
+    </div>
+
+    <h2>TC-07 · Edge Case — Gambar (Blind Spot)</h2>
+    <p>
+      Konten dalam gambar. Program TIDAK akan mendeteksi ini — dokumentasikan
+      sebagai limitasi.
+    </p>
+
+    <div class="case">
+      <div class="label">
+        TC-07a — Teks judol dalam atribut alt (cek apakah alt text ikut di-scan)
+      </div>
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        alt="GACOR99 daftar sekarang"
+      />
+    </div>
+
+    <div class="case">
+      <div class="label">
+        TC-07b — Teks judol sebagai nama file gambar (tidak terbaca program)
+      </div>
+      <img src="gacor99-maxwin88.png" />
+    </div>
+  </body>
+</html>
+""" file_path = "judol_detector_test_cases_clean.html" with open(file_path, "w",
+encoding="utf-8") as file: file.write(html_content) print(f"File successfully
+created: {file_path}")
