@@ -11,3 +11,8 @@
     user-select: none; /* teks yang diblur tidak bisa diselect */
     transition: filter 0.3s ease; /* animasi sederhana utk efek blur */
 }
+
+img.is-blurred {
+    filter: blur(20px) !important;
+    transition: filter 0.3s ease;
+}
