@@ -1,7 +1,7 @@
-# Judol Detector — Browser Extension
+# Judol Detector : Browser Extension
 
 > Tugas Besar 3 IF2211 Strategi Algoritma  
-> Institut Teknologi Bandung — Semester Genap 2025/2026
+> Institut Teknologi Bandung | Semester Genap 2025/2026
 
 Judol Detector adalah ekstensi browser berbasis Chromium yang mendeteksi konten judi online (*judol*) pada halaman web secara otomatis menggunakan berbagai algoritma *string matching*. Keyword yang terdeteksi akan di-highlight langsung di halaman, dilengkapi tooltip statistik dan fitur blur. Ekstensi juga mendukung OCR untuk mendeteksi keyword pada gambar.
 
