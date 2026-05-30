@@ -85,3 +85,5 @@ handicap
 1x2
 bahasa
 taruhan bola
+scatter
+hoki
