@@ -174,7 +174,7 @@ Klik ikon extension di toolbar Chrome untuk membuka popup yang menampilkan:
 Gambar pada halaman web yang mengandung keyword judol akan otomatis di-blur oleh fitur OCR berbasis Tesseract.js yang berjalan secara offline.
 
 ### Menambah Keyword
-Edit file `keywords/keywords.txt` — satu keyword per baris — lalu build ulang extension.
+Edit file `keywords/keywords.txt`, satu keyword per baris, lalu build ulang extension.
 
 ---
 
