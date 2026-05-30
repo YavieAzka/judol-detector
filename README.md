@@ -22,15 +22,15 @@ Judol Detector adalah ekstensi browser berbasis Chromium yang mendeteksi konten 
 
 ## Fitur
 
-- **Exact Matching** — deteksi keyword eksak menggunakan KMP, Boyer-Moore, dan Aho-Corasick
-- **Pattern Matching** — deteksi pola `<kata><angka>` (seperti `SLOT99`) menggunakan Regex dan Rabin-Karp
-- **Fuzzy Matching** — deteksi manipulasi visual (*leetspeak* dan homoglyph unicode) menggunakan Weighted Levenshtein Distance
-- **OCR** — deteksi keyword pada gambar di halaman web menggunakan Tesseract.js (berjalan secara offline)
-- **Highlight & Blur** — visualisasi keyword terdeteksi langsung di DOM tanpa merusak layout halaman
-- **Tooltip** — menampilkan detail hasil deteksi (keyword, algoritma, jumlah kemunculan, waktu eksekusi) saat hover
-- **Popup Statistik** — menampilkan total keyword, waktu eksekusi per algoritma, dan grafik perbandingan
-- **Rescan** — memindai ulang halaman tanpa perlu refresh
-- **MutationObserver** — mendukung halaman dengan infinite scroll (Twitter/X, Instagram, dll.)
+- **Exact Matching** : deteksi keyword eksak menggunakan KMP, Boyer-Moore, dan Aho-Corasick
+- **Pattern Matching** : deteksi pola `<kata><angka>` (seperti `SLOT99`) menggunakan Regex dan Rabin-Karp
+- **Fuzzy Matching** : deteksi manipulasi visual (*leetspeak* dan homoglyph unicode) menggunakan Weighted Levenshtein Distance
+- **OCR** : deteksi keyword pada gambar di halaman web menggunakan Tesseract.js (berjalan secara offline)
+- **Highlight & Blur** : visualisasi keyword terdeteksi langsung di DOM tanpa merusak layout halaman
+- **Tooltip** : menampilkan detail hasil deteksi (keyword, algoritma, jumlah kemunculan, waktu eksekusi) saat hover
+- **Popup Statistik** : menampilkan total keyword, waktu eksekusi per algoritma, dan grafik perbandingan
+- **Rescan** : memindai ulang halaman tanpa perlu refresh
+- **MutationObserver** : mendukung halaman dengan infinite scroll (Twitter/X, Instagram, dll.)
 
 ---
 
