@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Judol Detector — Edge Case Test Page</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 24px; background: #f5f5f5; color: #222; }
+    h1 { color: #2c3e50; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; }
+    h2 { color: #2c3e50; margin-top: 36px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .label-pass { display: inline-block; font-size: 11px; font-weight: bold; background: #27ae60; color: #fff; border-radius: 4px; padding: 2px 8px; margin-bottom: 10px; }
+    .label-fail { display: inline-block; font-size: 11px; font-weight: bold; background: #e74c3c; color: #fff; border-radius: 4px; padding: 2px 8px; margin-bottom: 10px; }
+    .label-warn { display: inline-block; font-size: 11px; font-weight: bold; background: #f39c12; color: #fff; border-radius: 4px; padding: 2px 8px; margin-bottom: 10px; }
+    p { line-height: 1.8; margin: 6px 0; }
+    .note { font-size: 12px; color: #888; margin-top: 10px; font-style: italic; }
+    .expected { font-size: 12px; color: #27ae60; margin-top: 4px; }
+    .not-expected { font-size: 12px; color: #e74c3c; margin-top: 4px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+    td, th { border: 1px solid #ddd; padding: 8px 12px; font-size: 13px; }
+    th { background: #f0f0f0; }
+    .long-text { font-size: 12px; line-height: 1.6; color: #444; }
+    hr { border: 0; border-top: 2px dashed #ddd; margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+<h1>Judol Detector — Edge Case Test Page</h1>
+<p style="color:#666; font-size:13px;">
+  Label <span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;">HARUS HIGHLIGHT</span> 
+  berarti kata tersebut wajib terdeteksi. Label 
+  <span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;">TIDAK BOLEH HIGHLIGHT</span> 
+  berarti false positive jika terdeteksi.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-01 · Keyword di Awal dan Akhir Teks</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT</span>
+  <p>GACOR adalah kata pertama di kalimat ini, dan tidak ada yang mendahuluinya.</p>
+  <p>Kata terakhir di kalimat ini adalah SLOT</p>
+  <p>TOGEL merupakan kata pertama, dan kata terakhirnya adalah MAXWIN</p>
+  <p class="expected">✔ Ekspektasi: GACOR, SLOT, TOGEL, MAXWIN semua ter-highlight meskipun berada di posisi boundary.</p>
+  <p class="note">Menguji apakah indeks boundary (startIndex=0 atau endIndex=length) ditangani dengan benar oleh KMP/BM.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-02 · Keyword Mengisi Seluruh Node Teks</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT</span>
+  <p>GACOR</p>
+  <p>SLOT</p>
+  <p>MAXWIN</p>
+  <p class="expected">✔ Ekspektasi: semua ter-highlight tanpa crash.</p>
+  <p class="note">Menguji splitText() di highlight.ts ketika localStartIndex=0 dan localEndIndex=node.length — tidak ada teks sebelum atau sesudah keyword.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-03 · Keyword Muncul Berulang dalam Satu Kalimat</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT (semua kemunculan)</span>
+  <p>SLOT SLOT SLOT adalah pilihan terbaik, SLOT gacor, SLOT online terpercaya.</p>
+  <p>GACOR GACOR GACOR — tiga kali disebut tetap harus terdeteksi semua.</p>
+  <p>Antara TOGEL dan TOGEL, mana yang lebih TOGEL dari keduanya?</p>
+  <p class="expected">✔ Ekspektasi: setiap kemunculan keyword ter-highlight secara independen, bukan hanya yang pertama.</p>
+  <p class="note">Menguji apakah KMP dan Aho-Corasick melanjutkan pencarian setelah menemukan match pertama.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-04 · Keyword sebagai Substring dari Kata Lain</h2>
+<div class="section">
+  <span class="label-warn">PERHATIKAN — apakah ini diinginkan?</span>
+  <hr>
+  <p>Kunjungi platform SLOTMANIA dan komunitas TOGELERS terbaik kami.</p>
+  <p>Bergabunglah di GACORBET dan MAXWINNER untuk pengalaman terbaik.</p>
+  <p>Promo JACKPOTBESAR menanti Anda di setiap hari Jumat malam.</p>
+  <p class="not-expected">⚠ Perhatikan: apakah SLOT di dalam SLOTMANIA ikut ter-highlight?</p>
+  <p class="note">Ini bukan benar/salah mutlak — tergantung keputusan desain. Catat hasilnya untuk analisis di laporan.</p>
+  <hr>
+  <span class="label-fail">TIDAK BOLEH HIGHLIGHT</span>
+  <p>Algoritma Boyer-Moore menggunakan bad character heuristic yang efisien.</p>
+  <p>Metode klasifikasi token dalam NLP menggunakan pendekatan statistik.</p>
+  <p class="not-expected">✘ Ekspektasi: tidak ada highlight — "Moore", "token", "klasifikasi" bukan keyword judol.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-05 · Case Sensitivity</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT (semua varian kapital)</span>
+  <p>slot gacor maxwin togel jackpot scatter hoki</p>
+  <p>Slot Gacor Maxwin Togel Jackpot Scatter Hoki</p>
+  <p>sLoT gAcOr mAxWiN tOgEl jAcKpOt sCaTtEr hOkI</p>
+  <p>SLOT GACOR MAXWIN TOGEL JACKPOT SCATTER HOKI</p>
+  <p class="expected">✔ Ekspektasi: semua baris ter-highlight identik — case-insensitive matching harus konsisten di semua algoritma.</p>
+  <p class="note">Menguji toLowerCase() yang diterapkan di KMP, BM, AC, dan RK secara konsisten.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-06 · Teks Panjang dengan Keyword Tersebar</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT</span>
+  <p class="long-text">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. GACOR 
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam. SLOT
+    Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam 
+    voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione. TOGEL
+    Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam.
+    Ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam. MAXWIN
+    Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui.
+    At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque. JACKPOT
+    Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere.
+    Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae. SCATTER
+    Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut. HOKI
+  </p>
+  <p class="expected">✔ Ekspektasi: GACOR, SLOT, TOGEL, MAXWIN, JACKPOT, SCATTER, HOKI semua terdeteksi meski tersebar di paragraf panjang.</p>
+  <p class="note">Menguji performa dan ketepatan deteksi di teks bervolume besar (~300 kata).</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-07 · Keyword di Elemen Nested</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT</span>
+  <p>Dapatkan <strong>JACKPOT</strong> dan <em>GACOR</em> hari ini juga!</p>
+  <p>Promo <u>MAXWIN</u> berlaku untuk <b>SLOT</b> dan <i>TOGEL</i> pilihan.</p>
+  <p>Klik <span style="color:red;">SCATTER</span> untuk info lebih lanjut tentang <mark>HOKI</mark>.</p>
+  <p class="expected">✔ Ekspektasi: keyword di dalam strong, em, u, b, i, span, mark semua ter-highlight.</p>
+  <p class="note">Menguji apakah TreeWalker di buildTextMap masuk ke semua child node terlepas dari tag HTML-nya.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-08 · Keyword di Elemen Interaktif dan Struktural</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT</span>
+  <p>Teks biasa dengan <a href="#">link berteks GACOR</a> di dalamnya.</p>
+  <p>Teks di dalam list:</p>
+  <ul>
+    <li>Platform SLOT terbaik</li>
+    <li>Bonus MAXWIN setiap hari</li>
+    <li>Jackpot TOGEL dijamin</li>
+  </ul>
+  <p>Teks di dalam blockquote:</p>
+  <blockquote style="border-left: 3px solid #ddd; padding-left: 12px; color: #666;">
+    "Hanya di sini GACOR dan SCATTER bisa dirasakan secara bersamaan."
+  </blockquote>
+  <p class="expected">✔ Ekspektasi: keyword di dalam a, li, blockquote ter-highlight.</p>
+  <p class="note">Menguji jangkauan TreeWalker pada berbagai elemen struktural HTML.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-09 · Teks Kosong, Whitespace, dan Node Trivial</h2>
+<div class="section">
+  <span class="label-fail">TIDAK BOLEH CRASH</span>
+  <p>   </p>
+  <p></p>
+  <p>&#8203;</p>
+  <div></div>
+  <span>   </span>
+  <p>Setelah elemen kosong di atas, teks normal: GACOR harus tetap terdeteksi.</p>
+  <p class="expected">✔ Ekspektasi: tidak ada crash, GACOR di baris terakhir tetap ter-highlight.</p>
+  <p class="note">Menguji penanganan flatTextMap.trim() === "" dan node teks yang hanya berisi whitespace.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-10 · Keyword di Antara Tanda Baca</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT (hanya keyword, bukan tanda bacanya)</span>
+  <p>(GACOR) [SLOT] {TOGEL} "MAXWIN" 'JACKPOT'</p>
+  <p>GACOR, SLOT. TOGEL! MAXWIN? JACKPOT:</p>
+  <p>GACOR—SLOT–TOGEL...MAXWIN</p>
+  <p>GACOR/SLOT\TOGEL|MAXWIN</p>
+  <p class="expected">✔ Ekspektasi: keyword ter-highlight, tanda baca di sekitarnya tidak ikut ter-highlight.</p>
+  <p class="note">Menguji apakah highlight hanya mencakup range keyword yang tepat tanpa merusak layout sekitarnya.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-11 · Keyword Overlapping dan Adjacent</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT</span>
+  <p>GACORSLOT — dua keyword langsung bersebelahan tanpa spasi.</p>
+  <p>SLOTTOGEL — apakah keduanya terdeteksi?</p>
+  <p>MAXWINJACKPOT — dua keyword panjang bersebelahan.</p>
+  <p class="expected">✔ Ekspektasi: setidaknya satu keyword terdeteksi per pasangan. Catat mana yang menang di filterOverlappingMatches.</p>
+  <p class="note">Menguji logika filterOverlappingMatches ketika dua keyword berada persis bersebelahan atau overlap.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>EC-12 · Kombinasi Fuzzy + Tanda Baca</h2>
+<div class="section">
+  <span class="label-pass">HARUS HIGHLIGHT</span>
+  <p>(SL0T) [GAC0R] {M4XWIN} "T0GEL" 'J4CKPOT'</p>
+  <p>SL0T, GAC0R. M4XWIN! T0GEL? J4CKPOT:</p>
+  <p class="expected">✔ Ekspektasi: varian fuzzy di antara tanda baca tetap terdeteksi setelah tokenizer memisahkan tanda baca dari token.</p>
+  <p class="note">Menguji interaksi antara tokenizer regex /[a-zA-Z0-9\u0080-\uFFFF]+/g dan logika fuzzy matching.</p>
+</div>
+
+</body>
+</html>
