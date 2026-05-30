@@ -1,17 +1,14 @@
 // struktur data hasil pencarian algoritma
 export interface SearchResult {
   keyword: string;
-  algorithm:
-    | "KMP"
-    | "BM"
-    | "Regex"
-    | "Levenshtein"
-    | "AhoCorasick"
-    | "RabinKarp";
+  algorithm: string;
   startIndex: number;
   endIndex: number;
   occurrences: number;
   executionTime: number;
+  timeDetails?: string; // detail waktu eksekusi tiap algoritma
+  occurrenceDetails?: string; // detail jumlah kemunculan tiap keyword
+  occurrenceMap?: Record<string, Record<string, number>>; // map kemunculan keyword per algoritma
 }
 
 // struktur data utk mapping karakter dengan node teks DOM

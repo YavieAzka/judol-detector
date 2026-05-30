@@ -1,74 +1,63 @@
-<script type="module" src="./popup.ts"></script>
-<body style="width: 350px; padding: 15px; font-family: Arial, sans-serif">
-  <h2 style="margin-top: 0; color: #2c3e50">Statistik Hasil Deteksi</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../styles/popup.css">
+</head>
+<body class="judol-popup">
+    <div class="header">
+        <div class="header-meta">
+            <h2>Judol Keyword Detector Statistics</h2>
+        </div>
+    </div>
 
-  <div
-    style="
-      background-color: #f8f9fa;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-    "
-  >
-    <p style="margin: 5px 0">
-      <strong>Total Keyword yang Ditemukan:</strong>
-      <span id="total-count">0</span>
-    </p>
-    <p
-      style="
-        margin: 0 0 5px 0;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 4px;
-      "
-    >
-      <strong>Waktu Eksekusi tiap Algoritma:</strong>
-    </p>
-    <ul style="margin: 0; padding-left: 20px; font-size: 13px">
-      <li>KMP: <span id="time-kmp">0.00</span> ms</li>
-      <li>Boyer-Moore: <span id="time-bm">0.00</span> ms</li>
-      <li>RegEx: <span id="time-regex">0.00</span> ms</li>
-      <li>Levenshtein: <span id="time-lev">0.00</span> ms</li>
-      <li>Aho-Corasick: <span id="time-ac">0.00</span> ms</li>
-      <li>Rabin-Karp: <span id="time-rk">0.00</span> ms</li>
-    </ul>
-  </div>
+    <div class="card">
+        <div class="stat-grid">
+            <div class="stat-box stat-box--center">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total Unique Keywords</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label stat-label--spaced">Execution Time</div>
+                <div class="stat-value time-list" id="execution-time">
+                    <div class="time-row"><span>KMP</span><span>0 ms</span></div>
+                    <div class="time-row"><span>BM</span><span>0 ms</span></div>
+                    <div class="time-row"><span>Regex</span><span>0 ms</span></div>
+                    <div class="time-row"><span>Lev</span><span>0 ms</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">Keyword Matches by Each Algorithm:</p>
+        <canvas id="statsChart" width="340" height="150" style="width: 100%;"></canvas>
+    </div>
 
-  <canvas
-    id="statsChart"
-    width="300"
-    height="200"
-    style="display: block; margin: 0 auto"
-  ></canvas>
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <h3 class="section-title">Keyword Occurrences</h3>
+            </div>
+        </div>
+        <div class="keyword-list" id="keyword-list"></div>
+    </div>
 
-  <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0" />
+    <div class="card">
+        <div class="toggle-row">
+            <span class="toggle-label">Toggle Blur</span>
+            <input type="checkbox" id="blur-toggle">
+        </div>
+        <div class="toggle-row">
+            <span class="toggle-label">Aho-Corasick (Bonus)</span>
+            <input type="checkbox" id="ac-toggle">
+        </div>
+        <div class="toggle-row">
+            <span class="toggle-label">Rabin-Karp (Bonus)</span>
+            <input type="checkbox" id="rk-toggle">
+        </div>
+    </div>
 
-  <label
-    style="
-      cursor: pointer;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-    "
-  >
-    <input type="checkbox" id="blur-toggle" style="margin-right: 8px" />
-    Aktifkan Blur
-  </label>
+    <button id="rescan-btn" class="btn-rescan">Rescan Page</button>
 
-  <button
-    id="rescan-btn"
-    style="
-      width: 100%;
-      padding: 10px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 15px;
-      transition: background-color 0.3s;
-    "
-  >
-    Rescan Halaman
-  </button>
+    <script type="module" src="./popup.ts"></script>
 </body>
+</html>

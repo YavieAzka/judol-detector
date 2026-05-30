@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+.judol-popup {
+	--primary: #0f766e;
+	--primary-strong: #115e59;
+	--accent: #f97316;
+	--surface: #ffffff;
+	--surface-tint: #f8fafc;
+	--background: #e2e8f0;
+	--text-main: #0f172a;
+	--text-muted: #475569;
+	--border: #d9e2ec;
+	--glow: rgba(15, 118, 110, 0.18);
+	width: 380px;
+	margin: 0;
+	padding: 20px;
+	font-family: "Space Grotesk", "Segoe UI", sans-serif;
+	background: linear-gradient(140deg, #f8fafc 0%, #e2e8f0 55%, #f8fafc 100%);
+	color: var(--text-main);
+	position: relative;
+	overflow: hidden;
+}
+
+.judol-popup::before {
+	content: "";
+	position: absolute;
+	inset: -30% -20% auto auto;
+	width: 260px;
+	height: 260px;
+	background: radial-gradient(circle at top, rgba(15, 118, 110, 0.22), transparent 70%);
+	pointer-events: none;
+	opacity: 0.7;
+}
+
+.judol-popup .header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	position: relative;
+	z-index: 1;
+}
+
+.judol-popup .header h2 {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 600;
+	font-family: "Fraunces", "Space Grotesk", sans-serif;
+	letter-spacing: 0.2px;
+}
+
+.judol-popup .header p {
+	margin: 4px 0 0;
+	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.judol-popup .header-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.judol-popup .badge {
+	align-self: flex-start;
+	background: rgba(15, 118, 110, 0.12);
+	color: var(--primary-strong);
+	font-size: 10px;
+	font-weight: 600;
+	padding: 4px 8px;
+	border-radius: 999px;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+}
+
+.judol-popup .card {
+	background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+	border: 1px solid rgba(15, 23, 42, 0.08);
+	border-radius: 16px;
+	padding: 16px;
+	margin-bottom: 16px;
+	box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+	position: relative;
+	z-index: 1;
+	animation: fadeUp 0.4s ease both;
+}
+
+.judol-popup .card:nth-of-type(2) { animation-delay: 0.05s; }
+.judol-popup .card:nth-of-type(3) { animation-delay: 0.1s; }
+
+.judol-popup .stat-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.judol-popup .stat-box {
+	background: var(--surface-tint);
+	padding: 12px;
+	border-radius: 12px;
+	text-align: center;
+	border: 1px solid rgba(15, 23, 42, 0.08);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.judol-popup .stat-value { font-size: 24px; font-weight: bold; color: var(--primary); }
+.judol-popup .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.judol-popup .stat-label--spaced { margin-bottom: 8px; }
+
+.judol-popup .stat-box--center {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 108px;
+}
+
+.judol-popup .time-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-main);
+}
+
+.judol-popup .time-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.judol-popup .section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.judol-popup .section-title {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text-main);
+}
+
+.judol-popup .section-subtitle {
+	margin: 2px 0 0;
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.judol-popup .section-pill {
+	background: rgba(15, 118, 110, 0.12);
+	color: var(--primary-strong);
+	font-size: 10px;
+	font-weight: 600;
+	padding: 4px 8px;
+	border-radius: 999px;
+}
+
+.judol-popup .keyword-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-height: 180px;
+	overflow: auto;
+	padding-right: 4px;
+}
+
+.judol-popup .keyword-item {
+	background: #ffffff;
+	border: 1px solid rgba(15, 23, 42, 0.08);
+	border-radius: 12px;
+	padding: 8px 10px;
+}
+
+.judol-popup .keyword-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.judol-popup .keyword-name {
+	color: var(--text-main);
+}
+
+.judol-popup .keyword-count {
+	color: var(--primary-strong);
+}
+
+.judol-popup .keyword-bar {
+	height: 6px;
+	background: rgba(15, 23, 42, 0.08);
+	border-radius: 999px;
+	overflow: hidden;
+	margin-top: 6px;
+}
+
+.judol-popup .keyword-bar-fill {
+	display: block;
+	height: 100%;
+	background: linear-gradient(90deg, var(--primary), var(--accent));
+	border-radius: 999px;
+}
+
+.judol-popup .toggle-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--border);
+}
+
+.judol-popup .toggle-row:last-child { border-bottom: none; }
+.judol-popup .toggle-label { font-size: 14px; font-weight: 500; }
+
+.judol-popup input[type="checkbox"] {
+	accent-color: var(--primary);
+}
+
+.judol-popup .btn-rescan {
+	width: 100%;
+	background: linear-gradient(120deg, var(--primary), var(--accent));
+	color: white;
+	border: none;
+	padding: 12px;
+	border-radius: 10px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: opacity 0.2s;
+	box-shadow: 0 10px 20px rgba(15, 118, 110, 0.25);
+}
+
+.judol-popup .btn-rescan:hover { opacity: 0.9; }
+
+@keyframes fadeUp {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: translateY(0); }
+}
