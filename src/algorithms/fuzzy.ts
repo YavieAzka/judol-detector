@@ -1,6 +1,7 @@
 import type { SearchResult } from "../interface.js";
 
 const VISUAL_SIMILAR_PAIRS: [string, string][] = [
+
   ["o", "0"],
   ["i", "1"],
   ["l", "1"],
@@ -13,21 +14,43 @@ const VISUAL_SIMILAR_PAIRS: [string, string][] = [
   ["b", "8"],
   ["q", "9"],
 
-  ["a", "α"], // alpha Yunani
-  ["o", "ο"], // omicron Yunani
-  ["e", "е"], // Cyrillic e
-  ["a", "а"], // Cyrillic a
-  ["p", "р"], // Cyrillic r (mirip p)
-  ["c", "с"], // Cyrillic s (mirip c)
-  ["i", "і"], // Cyrillic i
-  ["m", "μ"], //
-  ["n", "η"], // Eta Yunani mirip N
-  ["g", "γ"], // Gamma Yunani mirip G
-  ["t", "τ"], // Tau Yunani mirip T
-  ["a", "Α"], // Alpha Yunani kapital
-  ["o", "Ο"], // Omicron Yunani kapital
-  ["e", "Е"], // Cyrillic E kapital
-  ["m", "М"], // Cyrillic M kapital
+  ["a", "α"],  // Alpha
+  ["o", "ο"],  // Omicron
+  ["e", "ε"],  // Epsilon
+  ["n", "η"],  // Eta
+  ["m", "μ"],  // Mu
+  ["g", "γ"],  // Gamma
+  ["t", "τ"],  // Tau
+  ["p", "π"],  // Pi
+
+  ["a", "Α"],  // Alpha
+  ["o", "Ο"],  // Omicron
+  ["h", "Η"],  // Eta — untuk ΗOKI
+  ["s", "Ѕ"],  // (dipindah ke Cyrillic, lihat bawah)
+  ["m", "Μ"],  // Mu — untuk ΜAXWIN
+  ["n", "Ν"],  // Nu
+  ["t", "Τ"],  // Tau
+  ["p", "Π"],  // Pi
+  ["x", "Χ"],  // Chi
+
+  ["a", "а"],  // Cyrillic a
+  ["e", "е"],  // Cyrillic e
+  ["o", "о"],  // Cyrillic o
+  ["p", "р"],  // Cyrillic r
+  ["c", "с"],  // Cyrillic s
+  ["i", "і"],  // Cyrillic i
+  ["s", "ѕ"],  // Cyrillic dze
+  ["x", "х"],  // Cyrillic x — untuk MAХWIN
+
+  ["a", "А"],  // Cyrillic A
+  ["e", "Е"],  // Cyrillic E
+  ["o", "О"],  // Cyrillic O
+  ["p", "Р"],  // Cyrillic R
+  ["c", "С"],  // Cyrillic S
+  ["m", "М"],  // Cyrillic M — untuk МAXWIN
+  ["i", "І"],  // Cyrillic I
+  ["s", "Ѕ"],  // Cyrillic Dze — untuk Ѕlot
+  ["x", "Х"],  // Cyrillic X
 ];
 
 const SUBSTITUTION_COST_MAP = new Map<string, number>();
@@ -89,7 +112,7 @@ interface Token {
 
 function tokenize(text: string): Token[] {
   const tokens: Token[] = [];
-  const regex = /\S+/g;
+  const regex = /[a-zA-Z0-9\u0080-\uFFFF]+/g;
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(text)) !== null) {
@@ -144,6 +167,14 @@ export function fuzzySearch(
     const alreadyCovered = exactMatchedRanges.some(
       (range) => range.start <= token.startIndex && token.endIndex <= range.end,
     );
+
+    if (
+      token.word.toUpperCase().includes("SL0T") ||
+      token.word.toUpperCase().includes("GAC0R")
+    ) {
+      console.log("DEBUG token:", token.word, "covered:", alreadyCovered);
+    }
+
     if (alreadyCovered) continue;
 
     // Bandingkan token dengan setiap keyword, pilih yang paling mirip
