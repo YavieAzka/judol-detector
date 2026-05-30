@@ -1,4 +1,4 @@
-# Judol Detector : Browser Extension
+# Judol Detector | Browser Extension
 
 > Tugas Besar 3 IF2211 Strategi Algoritma  
 > Institut Teknologi Bandung | Semester Genap 2025/2026
