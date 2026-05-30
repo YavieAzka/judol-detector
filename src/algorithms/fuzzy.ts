@@ -165,7 +165,7 @@ export function fuzzySearch(
 
     // Skip token yang range-nya sudah di-cover exact match
     const alreadyCovered = exactMatchedRanges.some(
-      (range) => range.start <= token.startIndex && token.endIndex <= range.end,
+      (range) => range.start === token.startIndex && range.end === token.endIndex,
     );
 
     if (
