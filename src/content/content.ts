@@ -376,7 +376,7 @@ export function mergeOverlappingMatches(
   }
 
   // menghitung total execution time and occurrences pada keseluruhan page
-  const globalStats: Record<string, { time: number; count: number }> = {};
+  const globalStats: Record<string, { time: number; count: number; comparisons: number }> = {};
   const keywordStats: Record<string, Record<string, number>> = {};
   const matchesByAlgorithm: Record<string, SearchResult[]> = {};
 
@@ -386,10 +386,12 @@ export function mergeOverlappingMatches(
     if (existing) {
       existing.time = Math.max(existing.time, match.executionTime);
       existing.count += match.occurrences;
+      existing.comparisons = Math.max(existing.comparisons, match.comparisonCount ?? 0);
     } else {
       globalStats[match.algorithm] = {
         time: match.executionTime,
         count: match.occurrences,
+        comparisons: match.comparisonCount ?? 0,
       };
     }
 
@@ -451,7 +453,8 @@ export function mergeOverlappingMatches(
       .map((alg) => {
         const stats = globalStats[alg];
         const time = stats ? stats.time : 0;
-        return `${alg}: ${time.toFixed(2)} ms`;
+        const comps = stats && stats.comparisons > 0 ? ` (${stats.comparisons} comps)` : '';
+        return `${alg}: ${time.toFixed(2)} ms${comps}`;
       })
       .join("<br>");
 

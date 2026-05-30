@@ -27,34 +27,32 @@ export class Matcher {
     const startTime = performance.now();
     const results: SearchResult[] = [];
 
-    if (!pattern || pattern.length == 0) return results;
+    if (!pattern || pattern.length === 0) return results;
 
     const lps = this.computeLPSArray(pattern);
     let i = 0;
     let j = 0;
-    let occurences = 0;
+    let comparisonCount = 0;
 
     while (i < text.length) {
+      comparisonCount++;
       if (pattern[j]!.toLowerCase() === text[i]!.toLowerCase()) {
         j++;
         i++;
-      }
-      if (j === pattern.length) {
-        occurences++;
-        const startIndex = i - j;
-        results.push({
-          keyword: pattern,
-          algorithm: "KMP",
-          startIndex: startIndex,
-          endIndex: startIndex + pattern.length,
-          occurrences: 1,
-          executionTime: 0,
-        });
-        j = lps[j - 1]!;
-      } else if (
-        i < text.length &&
-        pattern[j]!.toLowerCase() !== text[i]!.toLowerCase()
-      ) {
+        if (j === pattern.length) {
+          const startIndex = i - j;
+          results.push({
+            keyword: pattern,
+            algorithm: "KMP",
+            startIndex: startIndex,
+            endIndex: startIndex + pattern.length,
+            occurrences: 1,
+            executionTime: 0,
+            comparisonCount: 0,
+          });
+          j = lps[j - 1]!;
+        }
+      } else {
         if (j !== 0) {
           j = lps[j - 1]!;
         } else {
@@ -63,7 +61,10 @@ export class Matcher {
       }
     }
     const executionTime = performance.now() - startTime;
-    results.forEach((rest) => (rest.executionTime = executionTime));
+    results.forEach((res) => {
+      res.executionTime = executionTime;
+      res.comparisonCount = comparisonCount;
+    });
     return results;
   }
 
@@ -116,16 +117,18 @@ export class Matcher {
 
     const badChar = this.buildBadCharTable(pattern);
     let s = 0; // pattern shift
-    let occurences = 0;
+    let comparisonCount = 0;
 
     while (s <= n - m) {
       let j = m - 1;
 
-      while (
-        j >= 0 &&
-        pattern[j]!.toLowerCase() === text[s + j]!.toLowerCase()
-      ) {
-        j--;
+      while (j >= 0) {
+        comparisonCount++;
+        if (pattern[j]!.toLowerCase() === text[s + j]!.toLowerCase()) {
+          j--;
+        } else {
+          break;
+        }
       }
 
       if (j < 0) {
@@ -136,6 +139,7 @@ export class Matcher {
           endIndex: s + m,
           occurrences: 1,
           executionTime: 0,
+          comparisonCount: 0,
         });
         s++;
       } else {
@@ -144,7 +148,10 @@ export class Matcher {
       }
     }
     const executionTime = performance.now() - startTime;
-    results.forEach((res) => (res.executionTime = executionTime));
+    results.forEach((res) => {
+      res.executionTime = executionTime;
+      res.comparisonCount = comparisonCount;
+    });
     return results;
   }
 }

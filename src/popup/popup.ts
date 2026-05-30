@@ -110,26 +110,38 @@ export async function renderStatistics(stats?: StorageData['judolStats']) {
         return times.length > 0 ? Math.max(...times) : 0;
     };
 
+    // mendapatkan jumlah perbandingan setiap algoritma dari hasil pencarian
+    const getAlgorithmComparisons = (algorithm: string) => {
+        const comps = filteredResults
+            .filter(result => result.algorithm === algorithm)
+            .map(result => result.comparisonCount ?? 0);
+        return comps.length > 0 ? Math.max(...comps) : 0;
+    };
+
     // update elemen DOM dengan waktu eksekusi setiap algoritma
     const kmpTime = getAlgorithmTime('KMP');
+    const kmpComps = getAlgorithmComparisons('KMP');
     const bmTime = getAlgorithmTime('BM');
+    const bmComps = getAlgorithmComparisons('BM');
     const regexTime = getAlgorithmTime('Regex');
     const levTime = getAlgorithmTime('Levenshtein');
     const acTime = useAhoCorasick ? getAlgorithmTime('AhoCorasick') : 0;
+    const acComps = useAhoCorasick ? getAlgorithmComparisons('AhoCorasick') : 0;
     const rkTime = useRabinKarp ? getAlgorithmTime('RabinKarp') : 0;
+    const rkComps = useRabinKarp ? getAlgorithmComparisons('RabinKarp') : 0;
 
     if (totalTimeElement) {
         const timeRows = [
-            `<div class="time-row"><span>KMP</span><span>${kmpTime.toFixed(2)} ms</span></div>`,
-            `<div class="time-row"><span>BM</span><span>${bmTime.toFixed(2)} ms</span></div>`,
+            `<div class="time-row"><span>KMP</span><span>${kmpTime.toFixed(2)} ms${kmpComps > 0 ? ` (${kmpComps} comps)` : ''}</span></div>`,
+            `<div class="time-row"><span>BM</span><span>${bmTime.toFixed(2)} ms${bmComps > 0 ? ` (${bmComps} comps)` : ''}</span></div>`,
             `<div class="time-row"><span>Regex</span><span>${regexTime.toFixed(2)} ms</span></div>`,
             `<div class="time-row"><span>Lev</span><span>${levTime.toFixed(2)} ms</span></div>`
         ];
         if (useAhoCorasick) {
-            timeRows.push(`<div class="time-row"><span>AC</span><span>${acTime.toFixed(2)} ms</span></div>`);
+            timeRows.push(`<div class="time-row"><span>AC</span><span>${acTime.toFixed(2)} ms${acComps > 0 ? ` (${acComps} comps)` : ''}</span></div>`);
         }
         if (useRabinKarp) {
-            timeRows.push(`<div class="time-row"><span>RK</span><span>${rkTime.toFixed(2)} ms</span></div>`);
+            timeRows.push(`<div class="time-row"><span>RK</span><span>${rkTime.toFixed(2)} ms${rkComps > 0 ? ` (${rkComps} comps)` : ''}</span></div>`);
         }
         totalTimeElement.innerHTML = timeRows.join('');
     }
