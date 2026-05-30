@@ -123,13 +123,12 @@ export class Matcher {
 
       while (
         j >= 0 &&
-        pattern[j]!.toLowerCase() == text[s + j]!.toLowerCase()
+        pattern[j]!.toLowerCase() === text[s + j]!.toLowerCase()
       ) {
         j--;
       }
 
       if (j < 0) {
-        occurences++;
         results.push({
           keyword: pattern,
           algorithm: "BM",
@@ -138,9 +137,7 @@ export class Matcher {
           occurrences: 1,
           executionTime: 0,
         });
-
-        const nextChar = s + m < n ? text[s + m]!.toLowerCase() : "";
-        s += s + m < n ? m - (badChar.get(nextChar) ?? -1) : 1;
+        s++;
       } else {
         const badCharShift = badChar.get(text[s + j]!.toLowerCase()) ?? -1;
         s += Math.max(1, j - badCharShift);

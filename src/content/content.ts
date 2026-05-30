@@ -4,6 +4,8 @@ import { buildTextMap } from "../content/dom_walker.js";
 import { Highlighter } from "../content/highlight.js";
 import { Matcher } from "../algorithms/algorithm.js";
 import { fuzzySearch } from "../algorithms/fuzzy.js";
+import { ahoCorasickSearch, rabinKarpSearch } from "../algorithms/bonus.js";
+
 // event listener untuk menerima pesan dari popup utk toggle blur
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // pesan yang diterima adalah perintah toggle blur
@@ -175,6 +177,9 @@ async function scanPage(
     );
   }
   rawResults.push(...exactResults);
+
+  rawResults.push(...ahoCorasickSearch(flatTextMap, keywordsToSearch));
+  rawResults.push(...rabinKarpSearch(flatTextMap, keywordsToSearch));
 
   const fuzzyResults = fuzzySearch(flatTextMap, keywordsToSearch, exactResults);
   rawResults.push(...fuzzyResults);
