@@ -1,21 +1,46 @@
-# Todos 
+# Chrome Extension String Matching
 
-## Job rationale 
-String matching is quite hard and there are lots of algorithms to implement in this tubes, hence we divide the jobs into three categories: 
-| Person | Job | 
-| ------ | --- | 
-| 1      | Actual string matching and regular expression matching, the math yada yada. |
-| 2 | Fuzzy matching. This person is also responsible in testing, i.e. determening edge-cases, etc.  | 
-| 3 | Chrome extension development (i.e. manifest.json, its animations, etc.). |
- 
-## Timeline 
-Say we have 13 days left, means we kind have a lot, but a lot of those times should be spent in creating edge cases and testings, instead of the actual development. So we can divide tasks into sprints. 
+## Steps to Run
 
-| Sprint | Tasks | 
-| ------ | ----- | 
-| 1      | Initial String matching, regular expresions, fuzzy matching, and chrome extension with stubs. 
-| 2      | Testing, a lot of testings, and edge case handling | 
-| 3      | Integrate perfected algorithms with chrome extension | 
-| 4      | Deliverables review + report | 
+Follow these instructions to run and load the extension in Google Chrome:
+
+### 1. Prerequisites
+
+Ensure you have *Node.js* (v18 or higher) and *npm* installed on your system.
+
+### 2. Installation
+
+Install the project dependencies by running:
+
+bash
+npm install
 
 
+### 3. Build the Extension
+
+Build the extension assets into the dist/ directory by executing:
+
+bash
+npm run build
+
+
+### 4. Load the Extension in Chrome
+
+1. Open Google Chrome and navigate to chrome://extensions/.
+2. Enable *Developer mode* by toggling the switch in the top-right corner.
+3. Click on the *Load unpacked* button in the top-left corner.
+4. Select the dist folder located in the root of this project directory.
+
+## Anggota Kelompok
+
+| Nama | NIM |
+|---|---|
+| Aufa Rienaldifaza Ahmad | 13524027 |
+| Yavie Azka Putra Araly | 13524077 |
+| Muhammad Dzaky Atha F. | 18223124 |
+
+---
+
+<p align="center">
+  Institut Teknologi Bandung · IF2211 Strategi Algoritma · 2025/2026
+</p>
