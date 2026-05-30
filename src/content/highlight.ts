@@ -27,16 +27,12 @@ export class Highlighter {
                 match.endIndex - mappedNode.startIndex
             );
 
-            // TODO (Your Job): 
-            // Use localStartIndex and localEndIndex with node.splitText() 
-            // to wrap the isolated text in <span class="judol-highlight">...</span>
+            // memanggil fungsi wrapNode untuk membungkus teks yang di-highlight dengan elemen span
             this.wrapNode(mappedNode.node, localStartIndex, localEndIndex, blurEnabled, match);
         }
     }
 
-    /**
-     * Physically splits a text node and wraps the target characters in a span.
-     */
+    // fungsi utk wrap teks yang di-highlight dengan elemen span dan menyimpan data hasil pencarian sebagai atribut dataset
     private static wrapNode(node: Text, start: number, end: number, blurEnabled: boolean, match: SearchResult) {
         // memastikan node memiliki parent sebelum melakukan split (edge case)
         if (!node.parentNode) {
@@ -63,11 +59,14 @@ export class Highlighter {
         if (blurEnabled) {
             span.classList.add("is-blurred");
         }
-
+        
+        // span utk menyimpan data hasil pencarian sebagai atribut dataset
         span.dataset.keyword = match.keyword;
         span.dataset.algorithm = match.algorithm;
         span.dataset.occurrences = match.occurrences.toString();
-        span.dataset.time = match.executionTime.toString();
+        span.dataset.time = match.timeDetails || `${match.executionTime} ms`;
+        span.dataset.occurrence = match.occurrenceDetails || `${match.occurrences}`;
+        span.dataset.occurrenceMap = JSON.stringify(match.occurrenceMap ?? {});
 
         node.parentNode.replaceChild(span, middleNode);
         span.appendChild(middleNode);

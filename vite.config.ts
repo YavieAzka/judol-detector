@@ -19,7 +19,8 @@ function chromeExtensionPlugin(): Plugin {
         if (fs.existsSync(srcPopup)) {
           const html = fs.readFileSync(srcPopup, 'utf-8');
           const fixed = html
-            .replace(/src="[^"]*popup\.js"/g, 'src="./popup.js"');
+            .replace(/src="[^"]*popup\.js"/g, 'src="./popup.js"')
+            .replace(/href="[^"]*assets\//g, 'href="./assets/');
           fs.writeFileSync(dstPopup, fixed);
           fs.rmSync(resolve(distDir, 'src'), { recursive: true, force: true });
         }
