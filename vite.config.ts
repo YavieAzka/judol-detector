@@ -35,7 +35,8 @@ export default defineConfig({
       input: {
         popup: resolve(rootDir, 'src/popup/popup.html'),
         content: resolve(rootDir, 'src/content/content.ts'),
-        background: resolve(rootDir, 'src/background/background.ts')
+        background: resolve(rootDir, 'src/background/background.ts'),
+        offscreen: resolve(rootDir, 'src/background/offscreen.ts')
       },
       output: {
         entryFileNames: '[name].js',

@@ -6,6 +6,13 @@ import { Matcher } from "../algorithms/algorithm.js";
 import { fuzzySearch } from "../algorithms/fuzzy.js";
 import { ahoCorasickSearch, rabinKarpSearch } from "../algorithms/bonus.js";
 
+function detectSentences(text: string): string[] {
+  if (!text) return [];
+  return text
+    .split(/[.!?\n\r]+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => sentence.length > 0);
+}
 // event listener untuk menerima pesan dari popup utk toggle blur
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // pesan yang diterima adalah perintah toggle blur
@@ -21,6 +28,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         span.classList.remove("is-blurred");
       }
     });
+
+    // mencari semua gambar yang terdeteksi mengandung keyword
+    const matchedImages = document.querySelectorAll("img.judol-image-matched");
+    matchedImages.forEach((img) => {
+      if (message.blurState === true) {
+        img.classList.add("is-blurred");
+      } else {
+        img.classList.remove("is-blurred");
+      }
+    });
+
     console.log(`Blur state: ${message.blurState}`);
     sendResponse({ status: "success" });
   }
@@ -31,6 +49,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     // menghapus semua highlight yang ada di halaman web
     Highlighter.removeAllHighlights();
+
+    // Reset status OCR pada semua gambar
+    const images = document.querySelectorAll("img");
+    images.forEach((img) => {
+      img.removeAttribute("data-ocr-processed");
+      img.classList.remove("judol-image-matched");
+      img.classList.remove("is-blurred");
+      img.removeAttribute("data-keyword");
+      img.removeAttribute("data-algorithm");
+      img.removeAttribute("data-occurrences");
+      img.removeAttribute("data-time");
+    });
 
     // scan ulang halaman web
     scanPage(document.body, true);
@@ -53,11 +83,14 @@ tooltip.style.borderRadius = "4px";
 tooltip.style.zIndex = "999999";
 document.body.appendChild(tooltip);
 
-// event listener untuk menampilkan tooltip saat hover pada hasil highlight
+// event listener untuk menampilkan tooltip saat hover pada hasil highlight atau gambar yang terdeteksi
 document.addEventListener("mouseover", (event) => {
   const target = event.target as HTMLElement;
 
-  if (target.classList.contains("judol-highlight")) {
+  if (
+    target.classList.contains("judol-highlight") ||
+    target.classList.contains("judol-image-matched")
+  ) {
     // komponen tooltip
     tooltip.innerHTML = `
             <strong>Keyword:</strong> ${target.dataset.keyword} <br>
@@ -73,10 +106,13 @@ document.addEventListener("mouseover", (event) => {
   }
 });
 
-// event listener saat mouse keluar dari hasil highlight
+// event listener saat mouse keluar dari hasil highlight atau gambar terdeteksi
 document.addEventListener("mouseout", (event) => {
   const target = event.target as HTMLElement;
-  if (target.classList.contains("judol-highlight")) {
+  if (
+    target.classList.contains("judol-highlight") ||
+    target.classList.contains("judol-image-matched")
+  ) {
     tooltip.style.display = "none";
   }
 });
@@ -149,6 +185,94 @@ export function filterOverlappingMatches(
   return filtered;
 }
 
+async function processImageOCR(
+  img: HTMLImageElement,
+  keywordsToSearch: string[],
+) {
+  if (img.dataset.ocrProcessed === "true") {
+    return;
+  }
+  img.dataset.ocrProcessed = "true";
+
+  const src = img.src || img.getAttribute("src");
+  if (!src) return;
+
+  if (src.startsWith("data:image") && src.length < 150) {
+    return;
+  }
+
+  const startTime = performance.now();
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: "PERFORM_OCR",
+      imageSrc: src,
+    });
+    const text = response?.text || "";
+    if (!text.trim()) return;
+
+    const sentences = detectSentences(text);
+    const imageResults: SearchResult[] = [];
+
+    for (const sentence of sentences) {
+      const rawResults: SearchResult[] = [];
+
+      rawResults.push(...Matcher.regexSearch(sentence));
+
+      const exactResults: SearchResult[] = [];
+      for (const keyword of keywordsToSearch) {
+        exactResults.push(...Matcher.kmpSearch(sentence, keyword || ""));
+        exactResults.push(
+          ...(Matcher.boyerMooreSearch(sentence, keyword) || []),
+        );
+      }
+      rawResults.push(...exactResults);
+
+      const fuzzyResults = fuzzySearch(
+        sentence,
+        keywordsToSearch,
+        exactResults,
+      );
+      rawResults.push(...fuzzyResults);
+
+      const filteredResults = filterOverlappingMatches(rawResults);
+      imageResults.push(...filteredResults);
+    }
+
+    if (imageResults.length > 0) {
+      img.classList.add("judol-image-matched");
+
+      const { isBlurEnabled } = (await chrome.storage.local.get(
+        "isBlurEnabled",
+      )) as { isBlurEnabled?: boolean };
+      const blurEnabled = isBlurEnabled !== false;
+
+      if (blurEnabled) {
+        img.classList.add("is-blurred");
+      }
+
+      img.dataset.keyword = Array.from(
+        new Set(imageResults.map((r) => r.keyword)),
+      ).join(", ");
+      img.dataset.algorithm = Array.from(
+        new Set(imageResults.map((r) => r.algorithm)),
+      ).join(", ");
+      img.dataset.occurrences = imageResults.length.toString();
+
+      const executionTime = performance.now() - startTime;
+      img.dataset.time = executionTime.toFixed(1);
+
+      imageResults.forEach((res) => {
+        res.executionTime = executionTime / imageResults.length;
+      });
+
+      await saveResultsToStorage(imageResults, false);
+    }
+  } catch (error) {
+    console.error("Gagal melakukan OCR pada gambar:", src, error);
+  }
+}
+
 // fungsi utama untuk melakukan scan pada halaman web
 async function scanPage(
   rootElement: HTMLElement = document.body,
@@ -157,6 +281,20 @@ async function scanPage(
   // ekstrak teks dari halaman web dan buat mapping antara karakter dengan node teks DOM
   const data = await chrome.storage.local.get("activeDictionary");
   const keywordsToSearch = data.activeDictionary || [];
+
+  // Cari semua gambar (img) di bawah rootElement
+  const images: HTMLImageElement[] = [];
+  if (rootElement instanceof HTMLImageElement) {
+    images.push(rootElement);
+  }
+  if (rootElement.querySelectorAll) {
+    images.push(...Array.from(rootElement.querySelectorAll("img")));
+  }
+
+  images.forEach((img) => {
+    processImageOCR(img, keywordsToSearch);
+  });
+
   const { flatTextMap, textNodeMap } = buildTextMap(rootElement);
 
   // jika element baru tidak memiliki teks
