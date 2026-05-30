@@ -76,13 +76,16 @@ export function ahoCorasickSearch(
   const lowerText = text.toLowerCase();
 
   let curr = root;
+  let comparisonCount = 0;
 
   for (let i = 0; i < lowerText.length; i++) {
     const ch = lowerText[i]!;
 
     while (curr !== root && !curr.children.has(ch)) {
+      comparisonCount++;
       curr = curr.failLink!;
     }
+    comparisonCount++;
 
     if (curr.children.has(ch)) {
       curr = curr.children.get(ch)!;
@@ -99,6 +102,7 @@ export function ahoCorasickSearch(
           endIndex: startIndex + keyword.length,
           occurrences: 1,
           executionTime: 0,
+          comparisonCount: 0,
         });
       }
       outputNode = outputNode.outputLinks;
@@ -106,7 +110,10 @@ export function ahoCorasickSearch(
   }
 
   const executionTime = performance.now() - startTime;
-  results.forEach((r) => (r.executionTime = executionTime));
+  results.forEach((r) => {
+    r.executionTime = executionTime;
+    r.comparisonCount = comparisonCount;
+  });
   return results;
 }
 
@@ -139,12 +146,13 @@ function modPow(base: number, exp: number, mod: number): number {
 function rabinKarpSingle(
   text: string,
   pattern: string,
-): Omit<SearchResult, "executionTime">[] {
+): { matches: Omit<SearchResult, "executionTime">[]; comparisons: number } {
   const results: Omit<SearchResult, "executionTime">[] = [];
   const n = text.length;
   const m = pattern.length;
+  let comparisons = 0;
 
-  if (m === 0 || m > n) return results;
+  if (m === 0 || m > n) return { matches: results, comparisons };
 
   const lowerText = text.toLowerCase();
   const lowerPattern = pattern.toLowerCase();
@@ -156,7 +164,15 @@ function rabinKarpSingle(
 
   for (let i = 0; i <= n - m; i++) {
     if (windowHash === patternHash) {
-      if (lowerText.slice(i, i + m) === lowerPattern) {
+      let matched = true;
+      for (let j = 0; j < m; j++) {
+        comparisons++;
+        if (lowerText[i + j] !== lowerPattern[j]) {
+          matched = false;
+          break;
+        }
+      }
+      if (matched) {
         results.push({
           keyword: pattern,
           algorithm: "RabinKarp",
@@ -178,7 +194,7 @@ function rabinKarpSingle(
     }
   }
 
-  return results;
+  return { matches: results, comparisons };
 }
 
 export function rabinKarpSearch(
@@ -187,16 +203,21 @@ export function rabinKarpSearch(
 ): SearchResult[] {
   const startTime = performance.now();
   const allResults: SearchResult[] = [];
+  let totalComparisons = 0;
 
   for (const keyword of keywords) {
     if (keyword.length === 0) continue;
-    const partial = rabinKarpSingle(text, keyword);
-    for (const r of partial) {
+    const { matches, comparisons } = rabinKarpSingle(text, keyword);
+    totalComparisons += comparisons;
+    for (const r of matches) {
       allResults.push({ ...r, executionTime: 0 });
     }
   }
 
   const executionTime = performance.now() - startTime;
-  allResults.forEach((r) => (r.executionTime = executionTime));
+  allResults.forEach((r) => {
+    r.executionTime = executionTime;
+    r.comparisonCount = totalComparisons;
+  });
   return allResults;
 }

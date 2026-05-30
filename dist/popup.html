@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script type="module" crossorigin src="./popup.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/popup-DC3OKb2y.css">
+</head>
+<body class="judol-popup">
+    <div class="header">
+        <div class="header-meta">
+            <h2>Judol Keyword Detector Statistics</h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="stat-grid">
+            <div class="stat-box stat-box--center">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total Unique Keywords</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label stat-label--spaced">Execution Time</div>
+                <div class="stat-value time-list" id="execution-time">
+                    <div class="time-row"><span>KMP</span><span>0 ms</span></div>
+                    <div class="time-row"><span>BM</span><span>0 ms</span></div>
+                    <div class="time-row"><span>Regex</span><span>0 ms</span></div>
+                    <div class="time-row"><span>Lev</span><span>0 ms</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">Keyword Matches by Each Algorithm:</p>
+        <canvas id="statsChart" width="340" height="150" style="width: 100%;"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <h3 class="section-title">Keyword Occurrences</h3>
+            </div>
+        </div>
+        <div class="keyword-list" id="keyword-list"></div>
+    </div>
+
+    <div class="card">
+        <div class="toggle-row">
+            <span class="toggle-label">Toggle Blur</span>
+            <input type="checkbox" id="blur-toggle">
+        </div>
+        <div class="toggle-row">
+            <span class="toggle-label">Aho-Corasick (Bonus)</span>
+            <input type="checkbox" id="ac-toggle">
+        </div>
+        <div class="toggle-row">
+            <span class="toggle-label">Rabin-Karp (Bonus)</span>
+            <input type="checkbox" id="rk-toggle">
+        </div>
+    </div>
+
+    <button id="rescan-btn" class="btn-rescan">Rescan Page</button>
+
+</body>
+</html>
