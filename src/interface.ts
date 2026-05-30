@@ -9,6 +9,7 @@ export interface SearchResult {
   timeDetails?: string; // detail waktu eksekusi tiap algoritma
   occurrenceDetails?: string; // detail jumlah kemunculan tiap keyword
   occurrenceMap?: Record<string, Record<string, number>>; // map kemunculan keyword per algoritma
+  comparisonCount?: number; // jumlah perbandingan karakter
 }
 
 // struktur data utk mapping karakter dengan node teks DOM
